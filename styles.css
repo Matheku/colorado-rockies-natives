@@ -209,13 +209,21 @@ a { color: inherit; }
 
 /* ---------- altimeter (signature) ---------- */
 
+/* Deliberately no transform here. A transformed ancestor becomes the containing
+   block for its position:fixed descendants, which would clip the vignette below
+   to this element's own box and render it as a hard-edged rectangle. Centre with
+   flex instead so the vignette can still resolve against the viewport. */
 .alt {
   position: fixed;
   right: clamp(14px, 2.2vw, 34px);
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0;
+  bottom: 0;
   z-index: 90;
   width: 92px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.6s var(--ease);
@@ -643,7 +651,8 @@ a { color: inherit; }
 }
 
 @media (max-width: 1080px) {
-  .alt { width: auto; right: 14px; top: 74px; transform: none; }
+  /* top-anchored on small screens; bottom:auto releases the flex centring */
+  .alt { display: block; width: auto; right: 14px; top: 74px; bottom: auto; }
   .alt__scale, .alt__legend { display: none; }
   .alt__head { justify-content: flex-end; }
   .alt__zone { margin-bottom: 0; }

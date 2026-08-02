@@ -298,9 +298,19 @@
     ST.update();
   }
 
+  // Layout keeps settling after load — the pin spacer resizes, lazy images
+  // resolve, webfonts reflow — so one re-seat is not enough. Retry on a short
+  // bounded schedule and stop as soon as the target is where it should be.
+  function settleAnchor() {
+    if (!window.location.hash) return;
+    [0, 120, 350, 700, 1200].forEach(function (d) {
+      gsap.delayedCall(d / 1000, reanchor);
+    });
+  }
+
   // late-loading images change layout height; re-measure once settled
-  window.addEventListener('load', function () { ST.refresh(); reanchor(); });
+  window.addEventListener('load', function () { ST.refresh(); settleAnchor(); });
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(function () { ST.refresh(); reanchor(); });
+    document.fonts.ready.then(function () { ST.refresh(); settleAnchor(); });
   }
 })();

@@ -223,14 +223,33 @@ a { color: inherit; }
 }
 .alt--on { opacity: 1; }
 
-/* keeps the readout legible where it crosses bright sky or snow */
+/* Legibility over bright sky and snow, without parking a soft dark blob on top
+   of the photograph. The darkening is an edge vignette anchored to the viewport
+   margin, so it reads as the page's own gutter rather than a floating smudge —
+   invisible on dark sections, quietly present where the image goes bright. */
 .alt::before {
   content: '';
-  position: absolute;
-  inset: -34px -30px -34px -52px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: clamp(130px, 24vw, 240px);
   z-index: -1;
-  background: radial-gradient(66% 54% at 74% 50%, color-mix(in oklab, var(--ink) 92%, transparent) 30%, transparent 78%);
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    color-mix(in oklab, var(--ink) 26%, transparent) 58%,
+    color-mix(in oklab, var(--ink) 66%, transparent) 100%
+  );
 }
+
+/* the rail carries its own contrast, so it never depends on the vignette */
+.alt {
+  text-shadow:
+    0 1px 2px color-mix(in oklab, #000 55%, transparent),
+    0 0 12px color-mix(in oklab, var(--ink) 62%, transparent);
+}
+.alt__scale { filter: drop-shadow(0 1px 1.5px color-mix(in oklab, #000 45%, transparent)); }
 
 .alt__head { display: flex; align-items: baseline; gap: 4px; justify-content: flex-end; }
 .alt__value {

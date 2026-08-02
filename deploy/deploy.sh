@@ -24,11 +24,17 @@ echo "→ deploying $SRC to $SSH_TARGET:$REMOTE_ROOT for $DOMAIN"
 ssh "$SSH_TARGET" DOMAIN="$DOMAIN" REMOTE_ROOT="$REMOTE_ROOT" 'bash -s' <<'REMOTE'
 set -euo pipefail
 
-if ! command -v nginx >/dev/null; then
-  echo "→ installing nginx"
+# rsync is needed on this side too — macOS now ships openrsync as the client,
+# and a minimal Vultr image may have no rsync at all, which fails the sync with
+# a confusing "command not found" from the remote shell.
+need=()
+command -v nginx >/dev/null || need+=(nginx)
+command -v rsync >/dev/null || need+=(rsync)
+if [ ${#need[@]} -gt 0 ]; then
+  echo "→ installing: ${need[*]}"
   export DEBIAN_FRONTEND=noninteractive
   apt-get update -qq
-  apt-get install -y -qq nginx
+  apt-get install -y -qq "${need[@]}"
 fi
 
 mkdir -p "$REMOTE_ROOT"

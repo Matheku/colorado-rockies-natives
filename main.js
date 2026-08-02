@@ -186,9 +186,13 @@
     });
     descent.push({ st: elevST, from: from, to: to, accent: accent });
 
-    // the whole chrome takes this species' colour while it holds the screen
-    function paint() {
-      if (accent) root.style.setProperty('--accent-live', accent.trim());
+    // The whole chrome takes this species' colour while it holds the screen.
+    // Same scroll guard as the altimeter: a jump back to the summit updates every
+    // trigger in one pass, and without it a section behind the viewport can repaint
+    // after the reset below has already run.
+    function paint(self) {
+      if (!accent || self.scroll() < self.start) return;
+      root.style.setProperty('--accent-live', accent.trim());
     }
     ST.create({
       trigger: sp,
